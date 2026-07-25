@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "sendkit": {
+      "type": "local",
+      "command": ["bun", "run", "dev:local-mcp"],
+      "environment": {
+        "TELEGRAM_BOT_TOKEN": "<bot-token>"
+      },
+      "enabled": true
+    }
+  }
+}
