@@ -1,11 +1,12 @@
 import { Command } from "commander";
 import { sendTelegramMessage } from "sendkit-core";
 
-const program = new Command();
-
-program
+const program = new Command()
   .name("sendkit")
   .description("SendKit tutorial CLI")
+  .showHelpAfterError();
+
+program
   .command("telegram")
   .description("Send a Telegram message")
   .argument("<chatId>", "Telegram chat Id")
@@ -14,16 +15,6 @@ program
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) {
       console.error("Missing TELEGRAM_BOT_TOKEN environment variable.");
-      process.exit(1);
-    }
-
-    if (!chatId) {
-      console.error("Missing Telegram Chat ID.");
-      process.exit(1);
-    }
-
-    if (!message) {
-      console.error("Missing Telegram message text.");
       process.exit(1);
     }
 
@@ -43,7 +34,9 @@ program
     }
   });
 
-await program.parseAsync(process.argv).catch((error: unknown) => {
+try {
+  await program.parseAsync(process.argv);
+} catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;
-});
+}

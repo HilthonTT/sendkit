@@ -1,6 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { sendTelegramMessage, telegramMessageInputSchema } from "sendkit-core";
+import {
+  sendTelegramMessage,
+  telegramMessageInputSchema,
+  telegramMessageOutputSchema,
+} from "sendkit-core";
 
 const server = new McpServer({
   name: "sendkit-local",
@@ -25,29 +29,45 @@ server.registerTool(
     title: "Telegram",
     description: "Send a Telegram message.",
     inputSchema: telegramMessageInputSchema.shape,
+    outputSchema: telegramMessageOutputSchema.shape,
   },
   async (input) => {
-    const result = await sendTelegramMessage({
-      ...input,
-      botToken: getTelegramBotToken(),
-    });
+    try {
+      const result = await sendTelegramMessage({
+        ...input,
+        botToken: getTelegramBotToken(),
+      });
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Sent Telegram message ${result.messageId} to chat ${result.chatId}`,
-        },
-      ],
-      structuredContent: result,
-    };
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Sent Telegram message ${result.messageId} to chat ${result.chatId}`,
+          },
+        ],
+        structuredContent: result,
+      };
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+
+      return {
+        isError: true,
+        content: [
+          {
+            type: "text",
+            text: `Failed to send Telegram message: ${detail}`,
+          },
+        ],
+      };
+    }
   },
 );
 
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log("Running local MCP!");
+  // stdout carries the JSON-RPC stream, so all logging has to go to stderr.
+  console.error("sendkit local MCP server running on stdio");
 }
 
 await main();

@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2022"],
     "module": "esnext",
     "moduleResolution": "bundler",
+    "moduleDetection": "force",
     "strict": true,
-    "types": ["node"],
-    "skipLibCheck": true
-  }
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node", "bun"],
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["packages/*/src/**/*.ts"]
 }

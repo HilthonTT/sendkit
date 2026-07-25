@@ -7,6 +7,9 @@ import {
   type TelegramMessageOptions,
 } from "./schemas";
 
+const TELEGRAM_API_BASE_URL = "https://api.telegram.org";
+const REQUEST_TIMEOUT_MS = 15_000;
+
 export async function sendTelegramMessage(
   input: TelegramMessageOptions,
 ): Promise<TelegramMessageOutput> {
@@ -17,17 +20,30 @@ export async function sendTelegramMessage(
   });
 
   const response = await fetch(
-    `https://api/telegram.org/bot${parsedInput.botToken}/sendMessage`,
+    `${TELEGRAM_API_BASE_URL}/bot${parsedInput.botToken}/sendMessage`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: await Response.json(requestBody).text(),
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     },
   );
 
-  const data = telegramSendMessageResponseSchema.parse(await response.json());
+  // Telegram answers errors with a JSON body too, but a proxy or an outage can
+  // return HTML. Fall back to the status line instead of a JSON parse error.
+  const parsedResponse = telegramSendMessageResponseSchema.safeParse(
+    await response.json().catch(() => null),
+  );
+
+  if (!parsedResponse.success) {
+    throw new Error(
+      `Unexpected Telegram API response (HTTP ${response.status} ${response.statusText})`,
+    );
+  }
+
+  const data = parsedResponse.data;
   if (!response.ok || !data.ok || !data.result) {
     throw new Error(data.description ?? "Telegram message request failed");
   }
