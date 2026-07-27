@@ -65,13 +65,19 @@ secret has to be committed. **OpenCode** uses `opencode.json` — replace the
 ```
 packages/
   core/        shared zod schemas + the sendTelegramMessage operation
+  mcp-tools/   the `telegram` MCP tool, shared by both MCP servers
   cli/         commander-based CLI wrapping core
-  local-mcp/   MCP stdio server wrapping core
+  local-mcp/   MCP stdio server wrapping mcp-tools
+apps/
+  remote-mcp/  Hono + Clerk MCP server over HTTP, wrapping mcp-tools
 ```
 
 `packages/core` is the single place where the Telegram API is called and where
-input/output shapes are validated, so the CLI and the MCP server can never drift
-apart.
+input/output shapes are validated, so the CLI and the MCP servers can never
+drift apart. `packages/mcp-tools` plays the same role one layer up: it owns the
+tool's name, description, schemas, and result formatting, so the local and
+remote servers expose an identical tool and differ only in transport and in how
+they resolve the bot token.
 
 ## License
 

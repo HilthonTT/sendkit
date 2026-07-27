@@ -3,11 +3,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { Hono, type Context } from "hono";
 import { createClerkClient } from "@clerk/backend";
 import { generateClerkProtectedResourceMetadata } from "@clerk/mcp-tools/server";
-import {
-  sendTelegramMessage,
-  telegramMessageInputSchema,
-  telegramMessageOutputSchema,
-} from "sendkit-core";
+import { registerTelegramTool } from "sendkit-mcp-tools";
 
 const clerkPublishableKey = process.env.CLERK_PUBLISHABLE_KEY;
 const clerkSecretKey = process.env.CLERK_SECRET_KEY;
@@ -31,45 +27,7 @@ function createServer(botToken: string) {
     version: "0.0.0",
   });
 
-  server.registerTool(
-    "telegram",
-    {
-      title: "Telegram",
-      description: "Send a Telegram message.",
-      inputSchema: telegramMessageInputSchema.shape,
-      outputSchema: telegramMessageOutputSchema.shape,
-    },
-    async (input) => {
-      try {
-        const result = await sendTelegramMessage({
-          ...input,
-          botToken,
-        });
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Sent Telegram message ${result.messageId} to chat ${result.chatId}`,
-            },
-          ],
-          structuredContent: result,
-        };
-      } catch (error) {
-        const detail = error instanceof Error ? error.message : String(error);
-
-        return {
-          isError: true,
-          content: [
-            {
-              type: "text",
-              text: `Failed to send Telegram message: ${detail}`,
-            },
-          ],
-        };
-      }
-    },
-  );
+  registerTelegramTool(server, () => botToken);
 
   return server;
 }
@@ -78,7 +36,7 @@ const app = new Hono();
 
 function protectedResourceMetadataUrl(c: Context, botToken: string) {
   return new URL(
-    `./well-known/oauth-protected-resource/:botToken/mcp/${botToken}/mcp`,
+    `/.well-known/oauth-protected-resource/${botToken}/mcp`,
     c.req.url,
   ).toString();
 }
@@ -91,7 +49,7 @@ function unauthorizedMcpResponse(c: Context, botToken: string) {
   return c.json({ error: "Unauthorized" }, 401);
 }
 
-app.get("./well-known/oauth-protected-resource/:botToken/mcp", (c) => {
+app.get("/.well-known/oauth-protected-resource/:botToken/mcp", (c) => {
   return c.json(
     generateClerkProtectedResourceMetadata({
       publishableKey: clerkPublishableKey,
@@ -119,7 +77,7 @@ app.post("/:botToken/mcp", async (c) => {
     if (!requestState.isAuthenticated) {
       return unauthorizedMcpResponse(c, botToken);
     }
-  } catch (error) {
+  } catch {
     return unauthorizedMcpResponse(c, botToken);
   }
 

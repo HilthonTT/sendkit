@@ -18,7 +18,7 @@
         "@clerk/mcp-tools": "^0.6.0",
         "@modelcontextprotocol/sdk": "^1.29.0",
         "hono": "^4.12.32",
-        "sendkit-core": "workspace:*",
+        "sendkit-mcp-tools": "workspace:*",
       },
     },
     "packages/cli": {
@@ -38,6 +38,14 @@
     },
     "packages/local-mcp": {
       "name": "sendkit-mcp",
+      "version": "0.0.0",
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.29.0",
+        "sendkit-mcp-tools": "workspace:*",
+      },
+    },
+    "packages/mcp-tools": {
+      "name": "sendkit-mcp-tools",
       "version": "0.0.0",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
@@ -266,6 +274,8 @@
     "sendkit-core": ["sendkit-core@workspace:packages/core"],
 
     "sendkit-mcp": ["sendkit-mcp@workspace:packages/local-mcp"],
+
+    "sendkit-mcp-tools": ["sendkit-mcp-tools@workspace:packages/mcp-tools"],
 
     "sendkit-remote-mcp": ["sendkit-remote-mcp@workspace:apps/remote-mcp"],
 
