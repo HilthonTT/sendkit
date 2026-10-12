@@ -97,18 +97,37 @@ app.post("/:botToken/mcp", async (c) => {
   }
 });
 
+// Stateless server: there is no standalone SSE stream to open (GET) and no
+// session to terminate (DELETE). The spec asks for 405 so clients fall back.
+app.on(["GET", "DELETE"], "/:botToken/mcp", (c) => {
+  c.header("Allow", "POST");
+  return c.json({ error: "Method not allowed" }, 405);
+});
+
 app.notFound((c) => {
   return c.json({ error: "Not found" }, 404);
 });
 
 const port = Number(process.env.PORT ?? 3000);
 
+// Proxy chains append to these headers ("https, http"); the first entry is the
+// one the client actually used.
+function forwardedHeader(req: Request, name: string) {
+  return req.headers.get(name)?.split(",")[0]?.trim() || undefined;
+}
+
 export default {
   port,
   fetch: (req: Request) => {
     const url = new URL(req.url);
-    url.protocol = req.headers.get("x-forwarded-proto") ?? url.protocol;
-    url.host = req.headers.get("x-forwarded-host") ?? url.host;
+    url.protocol = forwardedHeader(req, "x-forwarded-proto") ?? url.protocol;
+    const forwardedHost = forwardedHeader(req, "x-forwarded-host");
+    if (forwardedHost) {
+      // Setting `host` without a port keeps the old one, which would leak the
+      // internal listen port into the advertised OAuth metadata URLs.
+      url.port = "";
+      url.host = forwardedHost;
+    }
 
     return app.fetch(new Request(url.toString(), req));
   },

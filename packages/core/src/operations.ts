@@ -1,7 +1,6 @@
 import {
   telegramMessageOptionsSchema,
   telegramMessageOutputSchema,
-  telegramSendMessageRequestSchema,
   telegramSendMessageResponseSchema,
   type TelegramMessageOutput,
   type TelegramMessageOptions,
@@ -13,23 +12,34 @@ const REQUEST_TIMEOUT_MS = 15_000;
 export async function sendTelegramMessage(
   input: TelegramMessageOptions,
 ): Promise<TelegramMessageOutput> {
-  const parsedInput = telegramMessageOptionsSchema.parse(input);
-  const requestBody = telegramSendMessageRequestSchema.parse({
-    chat_id: parsedInput.chatId,
-    text: parsedInput.message,
-  });
+  // Zod's default error message is a JSON dump of the issues; callers show
+  // this text to people (CLI) and models (MCP), so keep it to one line.
+  const parsedInput = telegramMessageOptionsSchema.safeParse(input);
+  if (!parsedInput.success) {
+    throw new Error(
+      parsedInput.error.issues.map((issue) => issue.message).join("; "),
+    );
+  }
+  const { botToken, chatId, message } = parsedInput.data;
 
-  const response = await fetch(
-    `${TELEGRAM_API_BASE_URL}/bot${parsedInput.botToken}/sendMessage`,
-    {
+  let response: Response;
+  try {
+    response = await fetch(`${TELEGRAM_API_BASE_URL}/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({ chat_id: chatId, text: message }),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    },
-  );
+    });
+  } catch (error) {
+    // The request URL contains the bot token, so never let it leak through a
+    // network error message.
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Could not reach the Telegram API: ${detail.replaceAll(botToken, "<bot-token>")}`,
+    );
+  }
 
   // Telegram answers errors with a JSON body too, but a proxy or an outage can
   // return HTML. Fall back to the status line instead of a JSON parse error.
@@ -45,12 +55,15 @@ export async function sendTelegramMessage(
 
   const data = parsedResponse.data;
   if (!response.ok || !data.ok || !data.result) {
-    throw new Error(data.description ?? "Telegram message request failed");
+    const code = data.error_code ?? response.status;
+    throw new Error(
+      `Telegram API error ${code}: ${data.description ?? "message request failed"}`,
+    );
   }
 
   return telegramMessageOutputSchema.parse({
     ok: true,
-    chatId: parsedInput.chatId,
+    chatId,
     messageId: data.result.message_id,
   });
 }

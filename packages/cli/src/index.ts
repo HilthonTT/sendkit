@@ -1,9 +1,16 @@
+#!/usr/bin/env bun
 import { Command } from "commander";
 import { sendTelegramMessage } from "sendkit-core";
 import { z } from "zod";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 
 const configPath = join(homedir(), ".config", "sendkit", "config.json");
 const cliConfigSchema = z.object({
@@ -18,6 +25,8 @@ function writeTelegramBotToken(token: string) {
   writeFileSync(configPath, data, {
     mode: 0o600,
   });
+  // `mode` only applies when the file is created; tighten an existing one too.
+  chmodSync(configPath, 0o600);
 }
 
 function getTelegramBotToken() {
@@ -25,9 +34,14 @@ function getTelegramBotToken() {
     throw new Error("Telegram bot token is required. Run `sendkit init`.");
   }
 
-  const config = cliConfigSchema.parse(
-    JSON.parse(readFileSync(configPath, "utf8")),
-  );
+  let config: z.infer<typeof cliConfigSchema>;
+  try {
+    config = cliConfigSchema.parse(JSON.parse(readFileSync(configPath, "utf8")));
+  } catch {
+    throw new Error(
+      `Invalid config at ${configPath}. Run \`sendkit init\` to recreate it.`,
+    );
+  }
 
   const token = config.telegramBotToken;
   if (!token) {
@@ -46,15 +60,15 @@ program
   .command("init")
   .description("Configure SendKit CLI local settings")
   .requiredOption("--telegram-bot-token <botToken>", "Telegram bot token")
-  .action(async (options: { telegramBotToken: string }) => {
+  .action((options: { telegramBotToken: string }) => {
     writeTelegramBotToken(options.telegramBotToken);
-    console.log(`Save SendKit CLI config to ${configPath}`);
+    console.log(`Saved SendKit CLI config to ${configPath}`);
   });
 
 program
   .command("telegram")
   .description("Send a Telegram message")
-  .argument("<chatId>", "Telegram chat Id")
+  .argument("<chatId>", "Telegram chat ID")
   .argument("<message>", "Message text to send")
   .action(async (chatId: string, message: string) => {
     const result = await sendTelegramMessage({

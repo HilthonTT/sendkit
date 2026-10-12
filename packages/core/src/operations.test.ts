@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import { sendTelegramMessage } from "./operations";
+import { TELEGRAM_MAX_MESSAGE_LENGTH } from "./schemas";
 
 const originalFetch = globalThis.fetch;
 
@@ -52,9 +53,16 @@ describe("sendTelegramMessage", () => {
     });
   });
 
-  it("throws with the Telegram description when the API rejects the request", async () => {
+  it("throws with the Telegram error code and description when the API rejects the request", async () => {
     mockFetch(
-      jsonResponse({ ok: false, description: "chat not found" }, 400),
+      jsonResponse(
+        {
+          ok: false,
+          error_code: 400,
+          description: "Bad Request: chat not found",
+        },
+        400,
+      ),
     );
 
     await expect(
@@ -63,7 +71,28 @@ describe("sendTelegramMessage", () => {
         chatId: "12345",
         message: "hello",
       }),
-    ).rejects.toThrow("chat not found");
+    ).rejects.toThrow("Telegram API error 400: Bad Request: chat not found");
+  });
+
+  it("keeps the bot token out of network error messages", async () => {
+    globalThis.fetch = (async (
+      input: FetchArgs[0],
+      _init: FetchArgs[1],
+    ): Promise<Response> => {
+      throw new Error(`Unable to connect to ${String(input)}`);
+    }) as typeof fetch;
+
+    const error = await sendTelegramMessage({
+      botToken: "secret-token",
+      chatId: "12345",
+      message: "hello",
+    }).then(
+      () => undefined,
+      (e: unknown) => (e instanceof Error ? e.message : String(e)),
+    );
+
+    expect(error).toStartWith("Could not reach the Telegram API");
+    expect(error).not.toContain("secret-token");
   });
 
   it("throws a readable error when the response is not Telegram JSON", async () => {
@@ -83,7 +112,7 @@ describe("sendTelegramMessage", () => {
     ).rejects.toThrow("Unexpected Telegram API response (HTTP 502");
   });
 
-  it("rejects invalid input before making a request", async () => {
+  it("rejects invalid input with a readable message before making a request", async () => {
     const calls = mockFetch(jsonResponse({ ok: true }));
 
     await expect(
@@ -92,7 +121,20 @@ describe("sendTelegramMessage", () => {
         chatId: "",
         message: "hello",
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/^Chat ID is required$/);
+    expect(calls).toHaveLength(0);
+  });
+
+  it("rejects messages longer than Telegram allows", async () => {
+    const calls = mockFetch(jsonResponse({ ok: true }));
+
+    await expect(
+      sendTelegramMessage({
+        botToken: "test-token",
+        chatId: "12345",
+        message: "x".repeat(TELEGRAM_MAX_MESSAGE_LENGTH + 1),
+      }),
+    ).rejects.toThrow(`at most ${TELEGRAM_MAX_MESSAGE_LENGTH} characters`);
     expect(calls).toHaveLength(0);
   });
 });
