@@ -31,8 +31,9 @@ message your bot and open `https://api.telegram.org/bot<TOKEN>/getUpdates`
 
 `bun run dev:local-mcp` registers a `telegram` tool (`chatId`, `message`) over stdio.
 The token comes from `TELEGRAM_BOT_TOKEN`, never from a tool argument.
-Claude Code picks up `.mcp.json` automatically (token read from `.env`). For
-OpenCode, put your token in `opencode.json` and keep it out of git.
+Claude Code (`.mcp.json`) and OpenCode (`opencode.json`) both start it from the
+repo root, where Bun loads the token from `.env`. Don't put tokens in those files:
+they are tracked by git.
 
 ## Remote MCP server
 
