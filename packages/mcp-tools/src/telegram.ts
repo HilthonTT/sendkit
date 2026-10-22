@@ -3,7 +3,7 @@ import {
   sendTelegramMessage,
   telegramMessageInputSchema,
   telegramMessageOutputSchema,
-} from "sendkit-core";
+} from "@sendkit/core";
 
 // Resolved per call rather than passed in as a string: the local server reads
 // it from the environment and wants a missing token reported as a tool error,

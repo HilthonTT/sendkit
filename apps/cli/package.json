@@ -7,9 +7,12 @@
   "bin": {
     "sendkit": "./src/index.ts"
   },
+  "scripts": {
+    "start": "bun run src/index.ts"
+  },
   "dependencies": {
+    "@sendkit/core": "workspace:*",
     "commander": "^15.0.0",
-    "sendkit-core": "workspace:*",
     "zod": "^4.4.3"
   }
 }

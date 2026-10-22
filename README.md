@@ -23,7 +23,7 @@ bun run dev:cli init --telegram-bot-token <token>
 bun run dev:cli telegram <chatId> "Hello from sendkit"
 ```
 
-Run `bun link` in `packages/cli` to get a global `sendkit` command. To find a chat ID,
+Run `bun link` in `apps/cli` to get a global `sendkit` command. To find a chat ID,
 message your bot and open `https://api.telegram.org/bot<TOKEN>/getUpdates`
 (`result[].message.chat.id`).
 
@@ -49,11 +49,11 @@ bot token in the URL, so **only run this over HTTPS**.
 `bun test` runs the tests; `bun run typecheck` type-checks the workspace.
 
 ```
-packages/core/       zod schemas + sendTelegramMessage (the only Telegram API caller)
-packages/mcp-tools/  the shared `telegram` MCP tool definition
-packages/cli/        commander CLI
-packages/local-mcp/  stdio MCP server
-apps/remote-mcp/     Hono + Clerk HTTP MCP server
+apps/cli/             commander CLI
+apps/local-mcp/       stdio MCP server
+apps/remote-mcp/      Hono + Clerk HTTP MCP server
+packages/core/        zod schemas + sendTelegramMessage (the only Telegram API caller)
+packages/mcp-tools/   the shared `telegram` MCP tool definition
 ```
 
 ## License

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { Command } from "commander";
-import { sendTelegramMessage } from "sendkit-core";
+import { sendTelegramMessage } from "@sendkit/core";
 import { z } from "zod";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -53,7 +53,7 @@ function getTelegramBotToken() {
 
 const program = new Command()
   .name("sendkit")
-  .description("SendKit CLI backed by sendkit-core")
+  .description("Send messages from the command line")
   .showHelpAfterError();
 
 program

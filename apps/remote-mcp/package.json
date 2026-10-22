@@ -1,12 +1,9 @@
 {
-  "name": "sendkit-remote-mcp",
+  "name": "@sendkit/remote-mcp",
   "version": "0.0.0",
   "private": true,
   "license": "GPL-3.0-only",
   "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "scripts": {
     "start": "bun run src/index.ts"
   },
@@ -14,7 +11,7 @@
     "@clerk/backend": "^3.13.1",
     "@clerk/mcp-tools": "^0.6.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "hono": "^4.12.32",
-    "sendkit-mcp-tools": "workspace:*"
+    "@sendkit/mcp-tools": "workspace:*",
+    "hono": "^4.12.32"
   }
 }

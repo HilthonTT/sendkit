@@ -10,47 +10,50 @@
         "typescript": "^7.0.2",
       },
     },
+    "apps/cli": {
+      "name": "sendkit",
+      "version": "0.0.0",
+      "bin": {
+        "sendkit": "./src/index.ts",
+      },
+      "dependencies": {
+        "@sendkit/core": "workspace:*",
+        "commander": "^15.0.0",
+        "zod": "^4.4.3",
+      },
+    },
+    "apps/local-mcp": {
+      "name": "@sendkit/local-mcp",
+      "version": "0.0.0",
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.29.0",
+        "@sendkit/mcp-tools": "workspace:*",
+      },
+    },
     "apps/remote-mcp": {
-      "name": "sendkit-remote-mcp",
+      "name": "@sendkit/remote-mcp",
       "version": "0.0.0",
       "dependencies": {
         "@clerk/backend": "^3.13.1",
         "@clerk/mcp-tools": "^0.6.0",
         "@modelcontextprotocol/sdk": "^1.29.0",
+        "@sendkit/mcp-tools": "workspace:*",
         "hono": "^4.12.32",
-        "sendkit-mcp-tools": "workspace:*",
-      },
-    },
-    "packages/cli": {
-      "name": "sendkit",
-      "version": "0.0.0",
-      "dependencies": {
-        "commander": "^15.0.0",
-        "sendkit-core": "workspace:*",
-        "zod": "^4.4.3",
       },
     },
     "packages/core": {
-      "name": "sendkit-core",
+      "name": "@sendkit/core",
       "version": "0.0.0",
       "dependencies": {
         "zod": "^4.4.3",
       },
     },
-    "packages/local-mcp": {
-      "name": "sendkit-mcp",
-      "version": "0.0.0",
-      "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.29.0",
-        "sendkit-mcp-tools": "workspace:*",
-      },
-    },
     "packages/mcp-tools": {
-      "name": "sendkit-mcp-tools",
+      "name": "@sendkit/mcp-tools",
       "version": "0.0.0",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
-        "sendkit-core": "workspace:*",
+        "@sendkit/core": "workspace:*",
         "zod": "^4.4.3",
       },
     },
@@ -65,6 +68,14 @@
     "@hono/node-server": ["@hono/node-server@1.19.15", "", { "peerDependencies": { "hono": "^4" } }, "sha512-Za2ai6TLdKjUvnur+eenO6nuYYipVAEhyCAdaV8IRvmU9kK8crOZUSYvIXn72E4f8fJqyAbpcJuTsYYmZp9Deg=="],
 
     "@modelcontextprotocol/sdk": ["@modelcontextprotocol/sdk@1.29.0", "", { "dependencies": { "@hono/node-server": "^1.19.9", "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "content-type": "^1.0.5", "cors": "^2.8.5", "cross-spawn": "^7.0.5", "eventsource": "^3.0.2", "eventsource-parser": "^3.0.0", "express": "^5.2.1", "express-rate-limit": "^8.2.1", "hono": "^4.11.4", "jose": "^6.1.3", "json-schema-typed": "^8.0.2", "pkce-challenge": "^5.0.0", "raw-body": "^3.0.0", "zod": "^3.25 || ^4.0", "zod-to-json-schema": "^3.25.1" }, "peerDependencies": { "@cfworker/json-schema": "^4.1.1" }, "optionalPeers": ["@cfworker/json-schema"] }, "sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ=="],
+
+    "@sendkit/core": ["@sendkit/core@workspace:packages/core"],
+
+    "@sendkit/local-mcp": ["@sendkit/local-mcp@workspace:apps/local-mcp"],
+
+    "@sendkit/mcp-tools": ["@sendkit/mcp-tools@workspace:packages/mcp-tools"],
+
+    "@sendkit/remote-mcp": ["@sendkit/remote-mcp@workspace:apps/remote-mcp"],
 
     "@stablelib/base64": ["@stablelib/base64@1.0.1", "", {}, "sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ=="],
 
@@ -270,15 +281,7 @@
 
     "send": ["send@1.2.1", "", { "dependencies": { "debug": "^4.4.3", "encodeurl": "^2.0.0", "escape-html": "^1.0.3", "etag": "^1.8.1", "fresh": "^2.0.0", "http-errors": "^2.0.1", "mime-types": "^3.0.2", "ms": "^2.1.3", "on-finished": "^2.4.1", "range-parser": "^1.2.1", "statuses": "^2.0.2" } }, "sha512-1gnZf7DFcoIcajTjTwjwuDjzuz4PPcY2StKPlsGAQ1+YH20IRVrBaXSWmdjowTJ6u8Rc01PoYOGHXfP1mYcZNQ=="],
 
-    "sendkit": ["sendkit@workspace:packages/cli"],
-
-    "sendkit-core": ["sendkit-core@workspace:packages/core"],
-
-    "sendkit-mcp": ["sendkit-mcp@workspace:packages/local-mcp"],
-
-    "sendkit-mcp-tools": ["sendkit-mcp-tools@workspace:packages/mcp-tools"],
-
-    "sendkit-remote-mcp": ["sendkit-remote-mcp@workspace:apps/remote-mcp"],
+    "sendkit": ["sendkit@workspace:apps/cli"],
 
     "serve-static": ["serve-static@2.2.1", "", { "dependencies": { "encodeurl": "^2.0.0", "escape-html": "^1.0.3", "parseurl": "^1.3.3", "send": "^1.2.0" } }, "sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw=="],
 

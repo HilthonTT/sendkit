@@ -1,5 +1,5 @@
 {
-  "name": "sendkit-mcp-tools",
+  "name": "@sendkit/mcp-tools",
   "version": "0.0.0",
   "private": true,
   "license": "GPL-3.0-only",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "sendkit-core": "workspace:*",
+    "@sendkit/core": "workspace:*",
     "zod": "^4.4.3"
   }
 }

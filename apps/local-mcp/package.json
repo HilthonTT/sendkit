@@ -1,14 +1,14 @@
 {
-  "name": "sendkit-mcp",
+  "name": "@sendkit/local-mcp",
   "version": "0.0.0",
   "private": true,
   "license": "GPL-3.0-only",
   "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
+  "scripts": {
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "sendkit-mcp-tools": "workspace:*"
+    "@sendkit/mcp-tools": "workspace:*"
   }
 }
