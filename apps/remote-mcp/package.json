@@ -8,10 +8,10 @@
     "start": "bun run src/index.ts"
   },
   "dependencies": {
-    "@clerk/backend": "^3.13.1",
+    "@clerk/backend": "^3.25.0",
     "@clerk/mcp-tools": "^0.6.0",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@sendkit/mcp-tools": "workspace:*",
-    "hono": "^4.12.32"
+    "hono": "^4.13.13"
   }
 }
