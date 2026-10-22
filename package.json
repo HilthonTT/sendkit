@@ -2,6 +2,7 @@
   "name": "sendkit-workspace",
   "private": true,
   "type": "module",
+  "license": "GPL-3.0-only",
   "workspaces": [
     "packages/*",
     "apps/*"

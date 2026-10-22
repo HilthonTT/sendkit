@@ -58,4 +58,4 @@ apps/remote-mcp/     Hono + Clerk HTTP MCP server
 
 ## License
 
-[MIT](./LICENSE)
+[GPL-3.0](./LICENSE)

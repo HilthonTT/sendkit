@@ -2,6 +2,7 @@
   "name": "sendkit",
   "version": "0.0.0",
   "private": true,
+  "license": "GPL-3.0-only",
   "type": "module",
   "bin": {
     "sendkit": "./src/index.ts"
