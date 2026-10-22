@@ -1,0 +1,37 @@
+name: Bug report
+description: Something in sendkit doesn't work as expected
+labels: [bug]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - CLI
+        - Local MCP server
+        - Remote MCP server
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include the command or MCP call, what you expected, and what you got. Never paste a bot token.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: bun-version
+    attributes:
+      label: Bun version
+      placeholder: bun --version
+  - type: input
+    id: os
+    attributes:
+      label: Operating system

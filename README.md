@@ -1,5 +1,8 @@
 # sendkit
 
+[![CI](https://github.com/HilthonTT/sendkit/actions/workflows/ci.yml/badge.svg)](https://github.com/HilthonTT/sendkit/actions/workflows/ci.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
+
 Send Telegram messages from a **CLI**, a **local MCP server** (stdio), or a
 **remote MCP server** (HTTP + Clerk OAuth). All three share one core, so the
 Telegram API is called and validated in a single place.
@@ -46,7 +49,9 @@ bot token in the URL, so **only run this over HTTPS**.
 
 ## Development
 
-`bun test` runs the tests; `bun run typecheck` type-checks the workspace.
+```bash
+bun run check   # typecheck + tests
+```
 
 ```
 apps/cli/             commander CLI
@@ -55,6 +60,9 @@ apps/remote-mcp/      Hono + Clerk HTTP MCP server
 packages/core/        zod schemas + sendTelegramMessage (the only Telegram API caller)
 packages/mcp-tools/   the shared `telegram` MCP tool definition
 ```
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details and [SECURITY.md](./SECURITY.md)
+to report a vulnerability.
 
 ## License
 
